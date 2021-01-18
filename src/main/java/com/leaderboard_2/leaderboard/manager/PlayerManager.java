@@ -21,7 +21,15 @@ public class PlayerManager {
     private final CreatePlayerRequestConverter createPlayerRequestConverter;
     private final UuidConverter uuidConverter;
 
+    /*
+     * Convert request input to data transfer objects and return as response body.
+     *
+     *@param  createplayerrequest body
+     *@return createplayerresponse body
+     */
     public CreatePlayerResponse createPlayer(CreatePlayerRequest createPlayerRequest){
+        if (createPlayerRequest.getCountry() == null) throw new IllegalArgumentException("Invalid country.");
+        if (createPlayerRequest.getName() == null) throw new IllegalArgumentException("Invalid name.");
         CreatePlayerDto createPlayerDto = createPlayerRequestConverter.apply(createPlayerRequest);
         PlayerDto player = playerService.createPlayer(createPlayerDto);
 
@@ -29,8 +37,14 @@ public class PlayerManager {
                 .playerDto(player)
                 .build();
     }
-
+    /*
+     *Convert request input to data transfer objects and return as response body.
+     *
+     *@param  uuid as string
+     *@return showplayerresponse body
+     */
     public ShowProfileResponse showProfile(String uuid){
+        if (uuid == null) throw new IllegalArgumentException("Invalid uuid.");
         ShowProfileDto showProfileDto = uuidConverter.apply(uuid);
         PlayerDto player = playerService.showProfile(showProfileDto);
 

@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class Score extends AbstractEntity {
     @Id
     @GeneratedValue
-    private Long id;
+    private Long score_seq;
 
     @Column(name = "user_id")
     private String userId;

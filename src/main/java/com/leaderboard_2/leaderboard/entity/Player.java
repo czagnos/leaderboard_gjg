@@ -14,17 +14,19 @@ import java.util.UUID;
 public class Player extends AbstractEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
 
-    private String uid = UUID.randomUUID().toString();
+    private String uid;
 
     private String name;
 
     private String country;
 
+    private int rank;
+
     @OneToOne
-    @JoinColumn(name = "score_id", referencedColumnName = "id")
+    @JoinColumn(name = "score_id", referencedColumnName = "score_seq")
     private Score score;
 
 }

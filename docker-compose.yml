@@ -19,6 +19,11 @@ services:
     ports:
       - "6379:6379"
 
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    container_name: dynamodb-local
+    ports:
+      - "8000:8000"
 volumes:
   dbdata:
     driver: local

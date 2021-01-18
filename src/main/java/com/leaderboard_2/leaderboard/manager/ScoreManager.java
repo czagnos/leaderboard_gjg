@@ -16,6 +16,10 @@ public class ScoreManager {
     private final ScoreService scoreService;
     private final SubmitScoreRequestConverter submitScoreRequestConverter;
 
+    /*
+     *@param  submitscorerequest body
+     *@return submitscoreresponse body
+     */
     public SubmitScoreResponse submitScore(SubmitScoreRequest submitScoreRequest){
         SubmitScoreDto submitScoreDto = submitScoreRequestConverter.apply(submitScoreRequest);
         SubmitScoreDto savedScore = scoreService.submitScore(submitScoreDto);

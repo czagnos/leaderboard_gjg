@@ -15,6 +15,13 @@ public class scoreController {
 
     private final ScoreManager scoreManager;
 
+
+    /*
+    * Getting request of submit a new score of player
+    *
+    * @param submitscorerequest body
+    * @return submitscoreresponse body
+     */
     @PostMapping("/v1/score/submit")
     public SubmitScoreResponse submitScore(@RequestBody SubmitScoreRequest submitScoreRequest){
         return scoreManager.submitScore(submitScoreRequest);

@@ -6,9 +6,9 @@ import lombok.Data;
 
 @Data
 @Builder
-public class PlayerDto {
-    private String uuid;
+public class PlayerLeaderboardDto {
     private String name;
     private Double score;
     private Integer rank;
+    private String country;
 }
