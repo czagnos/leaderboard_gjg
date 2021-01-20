@@ -1,7 +1,7 @@
 package com.leaderboard_2.leaderboard.controller;
 
 import com.leaderboard_2.leaderboard.manager.PlayerManager;
-import com.leaderboard_2.leaderboard.models.response.ShowProfileResponse;
+import com.leaderboard_2.leaderboard.models.response.GetProfileResponse;
 import org.springframework.web.bind.annotation.*;
 import com.leaderboard_2.leaderboard.models.response.CreatePlayerResponse;
 import com.leaderboard_2.leaderboard.models.request.CreatePlayerRequest;
@@ -32,8 +32,8 @@ public class playerController {
      *@return createplayerresponse body
      */
     @GetMapping("/v1/user/{uuid}")
-    public ShowProfileResponse showProfile(@PathVariable String uuid){
-        return playerManager.showProfile(uuid);
+    public GetProfileResponse getProfile(@PathVariable String uuid){
+        return playerManager.getProfile(uuid);
     }
 
 }

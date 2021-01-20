@@ -16,7 +16,6 @@ public class ScoreService {
 
     private final ScoreRepo scoreRepo;
     private final RedisService redisService;
-    private final PlayerRepo playerRepo;
 
     /*
      *Submit score to database and cache
@@ -25,9 +24,7 @@ public class ScoreService {
      * @return submitscoredto
      */
     public SubmitScoreDto submitScore(SubmitScoreDto submitScoreDto){
-        if(playerRepo.checkId(submitScoreDto.getUuid())==0)throw new IllegalArgumentException("Wrong uid.");
         redisService.cacheScore(submitScoreDto);
-      //  dynamoService.cacheScoreWithCountry(submitScoreDto);
         Score score = persistScore(submitScoreDto);
 
         return SubmitScoreDto.builder().uuid(score.getUserId())
@@ -40,11 +37,12 @@ public class ScoreService {
      *@param submitscoredto
      * @return score object
      */
-    private Score persistScore(SubmitScoreDto submitScoreDto){
-        Score score = new Score();
+    public Score persistScore(SubmitScoreDto submitScoreDto){
+        Score score = scoreRepo.findByUserId(submitScoreDto.getUuid());
         score.setUserId(submitScoreDto.getUuid());
         score.setScore(submitScoreDto.getScore());
-        scoreRepo.updateScore(score.getScore(),score.getUserId());
+        score.setCountry(submitScoreDto.getCountry());
+        scoreRepo.save(score);
         return score;
     }
 }

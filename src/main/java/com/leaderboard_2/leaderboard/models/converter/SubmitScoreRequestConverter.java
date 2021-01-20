@@ -14,6 +14,7 @@ public class SubmitScoreRequestConverter implements Function<SubmitScoreRequest,
         return SubmitScoreDto.builder()
                 .uuid(submitScoreRequest.getUuid())
                 .score(submitScoreRequest.getScore())
+                .country(submitScoreRequest.getCountry())
                 .build();
     }
 

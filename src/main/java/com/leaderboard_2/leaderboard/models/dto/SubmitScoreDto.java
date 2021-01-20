@@ -11,5 +11,6 @@ public class SubmitScoreDto {
     private Double score;
     private String uuid;
     private Long timestamp;
+    private String country;
 
 }

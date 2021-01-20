@@ -1,21 +1,16 @@
 package com.leaderboard_2.leaderboard.service;
 
 import com.leaderboard_2.leaderboard.entity.Player;
-import com.leaderboard_2.leaderboard.entity.Score;
 import com.leaderboard_2.leaderboard.models.converter.PlayerConverter;
 import com.leaderboard_2.leaderboard.models.converter.UuidConverter;
-import com.leaderboard_2.leaderboard.models.dto.PlayerDto;
 import com.leaderboard_2.leaderboard.models.dto.PlayerLeaderboardDto;
-import com.leaderboard_2.leaderboard.models.dto.ShowProfileDto;
+import com.leaderboard_2.leaderboard.models.dto.GetProfileDto;
 import com.leaderboard_2.leaderboard.models.dto.SubmitScoreDto;
 import com.leaderboard_2.leaderboard.repository.PlayerRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.Tuple;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +27,8 @@ public class RedisService {
     private final PlayerConverter playerConverter;
     public void cacheScore(SubmitScoreDto submitScoreDto){
         try (Jedis jedis = new Jedis("localhost")){
-            jedis.zadd("leaderboard", submitScoreDto.getScore(), submitScoreDto.getUuid().toString());
+            jedis.zadd("leaderboard-" + submitScoreDto.getCountry(), submitScoreDto.getScore(), submitScoreDto.getUuid());
+            jedis.zadd("leaderboard", submitScoreDto.getScore(), submitScoreDto.getUuid());
         }
     }
 
@@ -51,9 +47,9 @@ public class RedisService {
         }
         List<PlayerLeaderboardDto> pageList = new ArrayList<>();
         for (String uuid : uidTop) {
-            ShowProfileDto showProfileDto = uuidConverter.apply(uuid);
+            GetProfileDto showProfileDto = uuidConverter.apply(uuid);
              Player leaderboardPlayer    = playerRepo.findByUid(showProfileDto.getUuid());
-            leaderboardPlayer.setRank(playerService.getPlayerRank(uuid));
+            leaderboardPlayer.setRank(getPlayerRank(uuid));
             PlayerLeaderboardDto leaderboardPlayerdto = playerConverter.leaderboard(leaderboardPlayer);
             pageList.add(leaderboardPlayerdto);
         }
@@ -74,13 +70,40 @@ public class RedisService {
         }
         List<PlayerLeaderboardDto> pageList = new ArrayList<>();
         for (String uuid : uidPerPage) {
-            ShowProfileDto showProfileDto = uuidConverter.apply(uuid);
+            GetProfileDto showProfileDto = uuidConverter.apply(uuid);
             Player leaderboardPlayer    = playerRepo.findByUid(showProfileDto.getUuid());
-            leaderboardPlayer.setRank(playerService.getPlayerRank(uuid));
+            leaderboardPlayer.setRank(getPlayerRank(uuid));
             PlayerLeaderboardDto leaderboardPlayerdto = playerConverter.leaderboard(leaderboardPlayer);
             pageList.add(leaderboardPlayerdto);
         }
         return pageList;
 
+    }
+
+    public List<PlayerLeaderboardDto> getLeaderboardWithCountry( String country, int pageNum) {
+        Set<String> uidPerPage;
+        try (Jedis jedis = new Jedis("localhost") ){
+            //  uidPerPage =   jedis.zrevrangeByScore("leaderboard", 10000000, 0);
+            uidPerPage = jedis.zrevrange("leaderboard-"+country,(pageNum-1)*10, pageNum*10 -1);
+
+        }
+        List<PlayerLeaderboardDto> pageList = new ArrayList<>();
+        for (String uuid : uidPerPage) {
+            GetProfileDto showProfileDto = uuidConverter.apply(uuid);
+            Player leaderboardPlayer    = playerRepo.findByUid(showProfileDto.getUuid());
+            leaderboardPlayer.setRank(getPlayerRank(uuid));
+            PlayerLeaderboardDto leaderboardPlayerdto = playerConverter.leaderboard(leaderboardPlayer);
+            pageList.add(leaderboardPlayerdto);
+        }
+        return pageList;
+
+    }
+
+    public int getPlayerRank(String uuid){
+        Long currentRank;
+        try (Jedis jedis = new Jedis("localhost")){
+            currentRank = Long.sum(jedis.zrevrank("leaderboard",uuid),1);
+        }
+        return currentRank.intValue();
     }
 }

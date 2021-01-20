@@ -19,4 +19,7 @@ public class SubmitScoreRequest {
 
     @NotEmpty
     private Double score;
+
+    @NotEmpty
+    private String country;
 }

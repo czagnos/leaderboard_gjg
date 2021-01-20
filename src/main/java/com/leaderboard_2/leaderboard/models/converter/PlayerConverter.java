@@ -23,7 +23,7 @@ public class PlayerConverter implements Function<Player, PlayerDto> {
     }
 
 
-    public PlayerDto show(Player player){
+    public PlayerDto get(Player player){
         return PlayerDto.builder()
                 .uuid(player.getUid())
                 .name(player.getName())

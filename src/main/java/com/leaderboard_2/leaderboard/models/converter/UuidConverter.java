@@ -1,16 +1,16 @@
 package com.leaderboard_2.leaderboard.models.converter;
 
 
-import com.leaderboard_2.leaderboard.models.dto.ShowProfileDto;
+import com.leaderboard_2.leaderboard.models.dto.GetProfileDto;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Function;
 
 @Component
-public class UuidConverter implements Function<String, ShowProfileDto> {
+public class UuidConverter implements Function<String, GetProfileDto> {
 
         @Override
-        public ShowProfileDto apply(String uuid){
-            return ShowProfileDto.builder().uuid(uuid).build();
+        public GetProfileDto apply(String uuid){
+            return GetProfileDto.builder().uuid(uuid).build();
         }
 }

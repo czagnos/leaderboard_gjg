@@ -17,6 +17,9 @@ public class Score extends AbstractEntity {
 
     @Column(name = "user_id")
     private String userId;
+
     private Double score;
+
+    private String country;
 
 }
