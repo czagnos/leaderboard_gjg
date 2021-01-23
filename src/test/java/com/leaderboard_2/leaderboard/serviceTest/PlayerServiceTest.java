@@ -13,13 +13,20 @@ import com.leaderboard_2.leaderboard.repository.PlayerRepo;
 import com.leaderboard_2.leaderboard.service.PlayerService;
 import com.leaderboard_2.leaderboard.service.RedisService;
 import com.leaderboard_2.leaderboard.service.ScoreService;
+import org.apache.regexp.RE;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.UUID;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.in;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,6 +50,7 @@ public class PlayerServiceTest extends BaseTest {
     @Mock
     private RedisService redisService;
 
+
     @Test
     void shouldCreatePlayerInRepo() {
         //given
@@ -50,22 +58,24 @@ public class PlayerServiceTest extends BaseTest {
         SubmitScoreDto submitScoreDto = mock(SubmitScoreDto.class);
         CreatePlayerDto createPlayerDto = mock(CreatePlayerDto.class);
 
-        Player player = mock(Player.class);
-        Score score = mock(Score.class);
-        String uid = mock(String.class);
+        Player player = new Player();
+        Player createdPlayer = new Player();
+        Score score = new Score();
+        Score submittedScore = new Score();
+
 
         when(scoreConverter.apply(score)).thenReturn(submitScoreDto);
-        when(scoreService.submitScore(submitScoreDto)).thenReturn(submitScoreDto);
-        when(playerRepo.save(player)).thenReturn(player);
-        when(pLayerConverter.apply(player)).thenReturn(playerDto);
+        when(scoreService.persistScore(submitScoreDto)).thenReturn(submittedScore);
+        when(playerRepo.save(player)).thenReturn(createdPlayer);
+        when(pLayerConverter.apply(createdPlayer)).thenReturn(playerDto);
 
         //when
           PlayerDto response  = playerService.createPlayer(createPlayerDto);
 
         //then
-        InOrder inOrder = Mockito.inOrder(scoreConverter, scoreService,playerRepo,pLayerConverter);
+        InOrder inOrder = Mockito.inOrder(scoreConverter,scoreService,playerRepo,pLayerConverter);
         inOrder.verify(scoreConverter).apply(score);
-        inOrder.verify(scoreService).submitScore(submitScoreDto);
+        inOrder.verify(scoreService).persistScore(submitScoreDto);
         inOrder.verify(playerRepo).save(player);
         inOrder.verify(pLayerConverter).apply(player);
         inOrder.verifyNoMoreInteractions();

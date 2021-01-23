@@ -1,18 +1,11 @@
 package com.leaderboard_2.leaderboard.managerTest;
 
-import com.leaderboard_2.leaderboard.manager.PlayerManager;
+import com.leaderboard_2.leaderboard.base.BaseTest;
 import com.leaderboard_2.leaderboard.manager.ScoreManager;
-import com.leaderboard_2.leaderboard.models.converter.CreatePlayerRequestConverter;
 import com.leaderboard_2.leaderboard.models.converter.SubmitScoreRequestConverter;
-import com.leaderboard_2.leaderboard.models.converter.UuidConverter;
-import com.leaderboard_2.leaderboard.models.dto.CreatePlayerDto;
-import com.leaderboard_2.leaderboard.models.dto.PlayerDto;
 import com.leaderboard_2.leaderboard.models.dto.SubmitScoreDto;
-import com.leaderboard_2.leaderboard.models.request.CreatePlayerRequest;
 import com.leaderboard_2.leaderboard.models.request.SubmitScoreRequest;
-import com.leaderboard_2.leaderboard.models.response.CreatePlayerResponse;
 import com.leaderboard_2.leaderboard.models.response.SubmitScoreResponse;
-import com.leaderboard_2.leaderboard.service.PlayerService;
 import com.leaderboard_2.leaderboard.service.ScoreService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -25,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 
-public class ScoreManagerTest {
+public class ScoreManagerTest extends BaseTest {
 
     @InjectMocks
     private ScoreManager scoreManager;
@@ -55,6 +48,6 @@ public class ScoreManagerTest {
         inOrder.verify(scoreService).submitScore(submitScoreDto);
         inOrder.verifyNoMoreInteractions();
 
-        assertThat(response.getUuid()).isEqualTo(submitScoreDto.getUuid());
+        assertThat(response.getScore()).isEqualTo(submitScoreDto.getScore());
     }
 }

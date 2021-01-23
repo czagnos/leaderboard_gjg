@@ -40,7 +40,6 @@ public class ScoreController extends BaseTest {
 
         //then
         verify(scoreManager).submitScore(submitScoreRequest);
-        verifyNoMoreInteractions();
 
         assertThat(response.getScore().equals(submitScoreResponse.getScore()));
 

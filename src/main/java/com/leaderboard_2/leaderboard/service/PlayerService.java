@@ -24,7 +24,6 @@ public class PlayerService {
 
         private final PlayerRepo playerRepo;
         private final PlayerConverter pLayerConverter;
-        private final ScoreRepo scoreRepo;
         private final ScoreConverter scoreConverter;
         private  final  ScoreService scoreService;
         private  final  RedisService redisService;
@@ -42,18 +41,20 @@ public class PlayerService {
              */
         public PlayerDto createPlayer(CreatePlayerDto createPlayerDto){
             Player player = new Player();
-            String uid = UUID.randomUUID().toString();
             Score score = new Score();
+            String uid = UUID.randomUUID().toString();
             player.setUid(uid);
             player.setName(createPlayerDto.getName());
             player.setCountry(createPlayerDto.getCountry());
-            score.setScore(0.0);
+            player.setRank(playerRepo.countAllBy()+1);
+
             score.setUserId(uid);
+            score.setScore(0.0);
             score.setCountry(createPlayerDto.getCountry());
             SubmitScoreDto submitScoreDto = scoreConverter.apply(score);
-            scoreService.submitScore(submitScoreDto);
+            score = scoreService.persistScore(submitScoreDto);
+
             player.setScore(score);
-            player.setRank(redisService.getPlayerRank(uid));
             Player createdPlayer = playerRepo.save(player);
             return pLayerConverter.apply(createdPlayer);
         }
@@ -67,7 +68,6 @@ public class PlayerService {
 
             Player showedPlayer = playerRepo.findByUid(getProfileDto.getUuid());
             showedPlayer.setRank(redisService.getPlayerRank(getProfileDto.getUuid()));
-
             return pLayerConverter.get(showedPlayer);
         }
 

@@ -18,6 +18,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,7 +39,7 @@ class PlayerManagerTest extends BaseTest {
     private UuidConverter uuidConverter;
 
     @Test
-    void PlayerManagerTest() {
+    void shouldCreatePlayer() {
         //given
         CreatePlayerRequest createPlayerRequest = mock(CreatePlayerRequest.class);
         CreatePlayerDto createPlayerDto = mock(CreatePlayerDto.class);
@@ -61,7 +63,7 @@ class PlayerManagerTest extends BaseTest {
     @Test
     void shouldGetPlayerFromService() {
         //given
-        String uuid = mock(String.class);
+        String uuid = UUID.randomUUID().toString();
         GetProfileDto getPlayerDto = mock(GetProfileDto.class);
         PlayerDto playerDto = mock(PlayerDto.class);
 

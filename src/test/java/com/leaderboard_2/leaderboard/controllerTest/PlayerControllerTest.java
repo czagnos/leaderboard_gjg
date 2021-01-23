@@ -7,9 +7,12 @@ import com.leaderboard_2.leaderboard.models.request.CreatePlayerRequest;
 import com.leaderboard_2.leaderboard.models.response.CreatePlayerResponse;
 import com.leaderboard_2.leaderboard.models.response.GetProfileResponse;
 import org.junit.jupiter.api.*;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,16 +41,14 @@ public class PlayerControllerTest extends BaseTest {
 
         //then
         verify(playerManager).createPlayer(createPlayerRequest);
-        verifyNoMoreInteractions();
 
-        assertThat(response.getPlayerDto()).isEqualTo(createPlayerResponse);
+        assertThat(response.getPlayerDto()).isEqualTo(createPlayerResponse.getPlayerDto());
     }
 
     @Test
     void shouldGetPlayer() {
         //given
-        String uuid = mock(String.class);
-        CreatePlayerRequest createPlayerRequest = mock(CreatePlayerRequest.class);
+        String uuid = UUID.randomUUID().toString();
         GetProfileResponse getPlayerResponse = mock(GetProfileResponse.class);
 
         when(playerManager.getProfile(uuid)).thenReturn(getPlayerResponse);
@@ -57,9 +58,8 @@ public class PlayerControllerTest extends BaseTest {
 
         //then
         verify(playerManager).getProfile(uuid);
-        verifyNoMoreInteractions();
 
-        assertThat(response.getPlayerDto()).isEqualTo(getPlayerResponse);
+        assertThat(response.getPlayerDto()).isEqualTo(getPlayerResponse.getPlayerDto());
     }
 
 

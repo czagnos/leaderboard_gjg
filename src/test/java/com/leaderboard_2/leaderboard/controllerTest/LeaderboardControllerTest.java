@@ -5,7 +5,9 @@ import com.leaderboard_2.leaderboard.base.BaseTest;
 import com.leaderboard_2.leaderboard.controller.leaderboardController;
 import com.leaderboard_2.leaderboard.manager.LeaderboardManager;
 import com.leaderboard_2.leaderboard.models.dto.PlayerLeaderboardDto;
+import org.junit.Before;
 import org.junit.jupiter.api.*;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -25,13 +27,16 @@ public class LeaderboardControllerTest extends BaseTest {
     @Mock
     private LeaderboardManager leaderboardManager;
 
+    @Before
+    void setupAll(){
 
+    }
 
 
     @Test
     void shouldGetLeaderboard(){
       //given
-        List<PlayerLeaderboardDto> playerLeaderboard  = (List<PlayerLeaderboardDto>) mock(PlayerLeaderboardDto.class);
+        List<PlayerLeaderboardDto> playerLeaderboard  =  mock(List.class);
 
         Mockito.when(leaderboardManager.getLeaderboard()).thenReturn(playerLeaderboard);
 
@@ -39,8 +44,7 @@ public class LeaderboardControllerTest extends BaseTest {
         List<PlayerLeaderboardDto> playerLeaderboardDto = leaderboardController.leaderboard();
 
       //then
-        verify(leaderboardManager).getLeaderboard();
-        verifyNoMoreInteractions();
+       verify(leaderboardManager).getLeaderboard();
 
         assertThat(playerLeaderboardDto.equals(playerLeaderboard));
 
@@ -49,8 +53,8 @@ public class LeaderboardControllerTest extends BaseTest {
     @Test
     void shouldGetLeaderboardWithPageNumber(){
         //given
-        List<PlayerLeaderboardDto> playerLeaderboard  = (List<PlayerLeaderboardDto>) mock(PlayerLeaderboardDto.class);
-         int pageNum =mock(int.class);
+        List<PlayerLeaderboardDto> playerLeaderboard  = mock(List.class);
+         int pageNum = 2;
 
         when(leaderboardManager.getLeaderboardWithPageNumber(pageNum)).thenReturn(playerLeaderboard);
 
@@ -59,7 +63,6 @@ public class LeaderboardControllerTest extends BaseTest {
 
         //then
         verify(leaderboardManager).getLeaderboardWithPageNumber(pageNum);
-        verifyNoMoreInteractions();
 
 
         assertThat(playerLeaderboardDto.equals(playerLeaderboard));
@@ -69,9 +72,9 @@ public class LeaderboardControllerTest extends BaseTest {
     @Test
     void shouldGetLeaderboardWithCountry(){
         //given
-        List<PlayerLeaderboardDto> playerLeaderboard  = (List<PlayerLeaderboardDto>) mock(PlayerLeaderboardDto.class);
-         int pageNum = mock(int.class);
-         String country = mock(String.class);
+        List<PlayerLeaderboardDto> playerLeaderboard  =  mock(List.class);
+         int pageNum = 2;
+         String country = "tr";
          when(leaderboardManager.getLeaderboardWithCountry(country , pageNum)).thenReturn(playerLeaderboard);
 
         //when
@@ -79,7 +82,6 @@ public class LeaderboardControllerTest extends BaseTest {
 
         //then
         verify(leaderboardManager).getLeaderboardWithCountry(country, pageNum);
-        verifyNoMoreInteractions();
 
 
         assertThat(playerLeaderboardDto.equals(playerLeaderboard));

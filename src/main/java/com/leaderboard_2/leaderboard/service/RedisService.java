@@ -23,8 +23,8 @@ public class RedisService {
 
     private final UuidConverter uuidConverter;
     private final PlayerRepo playerRepo;
-    private final PlayerService playerService;
     private final PlayerConverter playerConverter;
+
     public void cacheScore(SubmitScoreDto submitScoreDto){
         try (Jedis jedis = new Jedis("localhost")){
             jedis.zadd("leaderboard-" + submitScoreDto.getCountry(), submitScoreDto.getScore(), submitScoreDto.getUuid());
@@ -46,12 +46,14 @@ public class RedisService {
 
         }
         List<PlayerLeaderboardDto> pageList = new ArrayList<>();
+        int index =  1 ;
         for (String uuid : uidTop) {
-            GetProfileDto showProfileDto = uuidConverter.apply(uuid);
-             Player leaderboardPlayer    = playerRepo.findByUid(showProfileDto.getUuid());
-            leaderboardPlayer.setRank(getPlayerRank(uuid));
+            GetProfileDto getProfileDto = uuidConverter.apply(uuid);
+             Player leaderboardPlayer    = playerRepo.findByUid(getProfileDto.getUuid());
+            leaderboardPlayer.setRank(index);
             PlayerLeaderboardDto leaderboardPlayerdto = playerConverter.leaderboard(leaderboardPlayer);
             pageList.add(leaderboardPlayerdto);
+            index++;
         }
         return pageList;
 
@@ -69,12 +71,14 @@ public class RedisService {
 
         }
         List<PlayerLeaderboardDto> pageList = new ArrayList<>();
+        int index = (pageNum-1)*10 +1 ;
         for (String uuid : uidPerPage) {
             GetProfileDto showProfileDto = uuidConverter.apply(uuid);
             Player leaderboardPlayer    = playerRepo.findByUid(showProfileDto.getUuid());
-            leaderboardPlayer.setRank(getPlayerRank(uuid));
+            leaderboardPlayer.setRank(index);
             PlayerLeaderboardDto leaderboardPlayerdto = playerConverter.leaderboard(leaderboardPlayer);
             pageList.add(leaderboardPlayerdto);
+            index++;
         }
         return pageList;
 
@@ -88,12 +92,14 @@ public class RedisService {
 
         }
         List<PlayerLeaderboardDto> pageList = new ArrayList<>();
+        int index = (pageNum-1)*10 +1 ;
         for (String uuid : uidPerPage) {
-            GetProfileDto showProfileDto = uuidConverter.apply(uuid);
-            Player leaderboardPlayer    = playerRepo.findByUid(showProfileDto.getUuid());
-            leaderboardPlayer.setRank(getPlayerRank(uuid));
+            GetProfileDto getProfileDto = uuidConverter.apply(uuid);
+            Player leaderboardPlayer    = playerRepo.findByUid(getProfileDto.getUuid());
+            leaderboardPlayer.setRank(index);
             PlayerLeaderboardDto leaderboardPlayerdto = playerConverter.leaderboard(leaderboardPlayer);
             pageList.add(leaderboardPlayerdto);
+            index++;
         }
         return pageList;
 
@@ -103,6 +109,14 @@ public class RedisService {
         Long currentRank;
         try (Jedis jedis = new Jedis("localhost")){
             currentRank = Long.sum(jedis.zrevrank("leaderboard",uuid),1);
+        }
+        return currentRank.intValue();
+    }
+
+    public int getPlayerRankByCountry(String uuid, String country){
+        Long currentRank;
+        try (Jedis jedis = new Jedis("localhost")){
+            currentRank = Long.sum(jedis.zrevrank("leaderboard"+country,uuid),1);
         }
         return currentRank.intValue();
     }

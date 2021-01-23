@@ -7,8 +7,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ScoreRepo extends JpaRepository<Score, UUID> {
-    Score findByUserId(String userId);
+
+
+   Optional<Score> findByUserId(String userId);
 }
