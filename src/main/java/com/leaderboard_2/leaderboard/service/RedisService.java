@@ -11,12 +11,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
 
 
 @Slf4j
@@ -31,8 +35,14 @@ public class RedisService {
     private final PlayerRepo playerRepo;
     private final PlayerConverter playerConverter;
 
+    private   String redisHost = "localhost";
+    private   int redisPort = 6379;
+
+
     public void cacheScore(SubmitScoreDto submitScoreDto){
-        try (Jedis jedis = new Jedis("localhost",6379)){
+
+
+        try (Jedis jedis = new Jedis(redisHost,redisPort)){
             jedis.zadd("leaderboard-" + submitScoreDto.getCountry(), submitScoreDto.getScore(), submitScoreDto.getUuid());
             jedis.zadd("leaderboard", submitScoreDto.getScore(), submitScoreDto.getUuid());
         }
@@ -46,7 +56,7 @@ public class RedisService {
     public List<PlayerLeaderboardDto> getLeaderboardTop() {
         Set<String> uidTop;
 
-        try (Jedis jedis = new Jedis("localhost",6379) ){
+        try (Jedis jedis = new Jedis(redisHost,redisPort)){
             uidTop = jedis.zrevrange("leaderboard",0, 9);
 
         }
@@ -70,7 +80,7 @@ public class RedisService {
      */
     public List<PlayerLeaderboardDto> getLeaderboardWithPageNumber(int pageNum) {
         Set<String> uidPerPage;
-        try (Jedis jedis = new Jedis("localhost",6379) ){
+        try (Jedis jedis = new Jedis(redisHost,redisPort)){
             uidPerPage = jedis.zrevrange("leaderboard",(pageNum-1)*10, pageNum*10 -1);
 
         }
@@ -90,7 +100,7 @@ public class RedisService {
 
     public List<PlayerLeaderboardDto> getLeaderboardWithCountry( String country, int pageNum) {
         Set<String> uidPerPage;
-        try (Jedis jedis = new Jedis("localhost",6379) ){
+        try (Jedis jedis = new Jedis(redisHost,redisPort)){
             uidPerPage = jedis.zrevrange("leaderboard-"+country,(pageNum-1)*10, pageNum*10 -1);
 
         }
@@ -110,7 +120,7 @@ public class RedisService {
 
     public int getPlayerRank(String uuid){
         Long currentRank;
-        try (Jedis jedis = new Jedis("localhost",6379)){
+        try (Jedis jedis = new Jedis(redisHost,redisPort)){
             currentRank = Long.sum(jedis.zrevrank("leaderboard",uuid),1);
         }
         return currentRank.intValue();
