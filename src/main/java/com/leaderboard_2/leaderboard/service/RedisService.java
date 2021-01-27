@@ -1,38 +1,50 @@
 package com.leaderboard_2.leaderboard.service;
 
 import com.leaderboard_2.leaderboard.entity.Player;
-import com.leaderboard_2.leaderboard.entity.Score;
 import com.leaderboard_2.leaderboard.models.converter.PlayerConverter;
 import com.leaderboard_2.leaderboard.models.converter.UuidConverter;
-import com.leaderboard_2.leaderboard.models.dto.PlayerDto;
 import com.leaderboard_2.leaderboard.models.dto.PlayerLeaderboardDto;
-import com.leaderboard_2.leaderboard.models.dto.ShowProfileDto;
+import com.leaderboard_2.leaderboard.models.dto.GetProfileDto;
 import com.leaderboard_2.leaderboard.models.dto.SubmitScoreDto;
 import com.leaderboard_2.leaderboard.repository.PlayerRepo;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.Tuple;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class RedisService {
 
+
+
+
     private final UuidConverter uuidConverter;
     private final PlayerRepo playerRepo;
-    private final PlayerService playerService;
     private final PlayerConverter playerConverter;
+
+    private   String redisHost = "localhost";
+    private   int redisPort = 6379;
+
+
     public void cacheScore(SubmitScoreDto submitScoreDto){
-        try (Jedis jedis = new Jedis("localhost")){
-            jedis.zadd("leaderboard", submitScoreDto.getScore(), submitScoreDto.getUuid().toString());
+
+
+        try (Jedis jedis = new Jedis(redisHost,redisPort)){
+            jedis.zadd("leaderboard-" + submitScoreDto.getCountry(), submitScoreDto.getScore(), submitScoreDto.getUuid());
+            jedis.zadd("leaderboard", submitScoreDto.getScore(), submitScoreDto.getUuid());
         }
     }
 
@@ -44,18 +56,19 @@ public class RedisService {
     public List<PlayerLeaderboardDto> getLeaderboardTop() {
         Set<String> uidTop;
 
-        try (Jedis jedis = new Jedis("localhost") ){
-        //    uidTop =   jedis.zrevrangeByScore("leaderboard",10000000, 0 );
+        try (Jedis jedis = new Jedis(redisHost,redisPort)){
             uidTop = jedis.zrevrange("leaderboard",0, 9);
 
         }
         List<PlayerLeaderboardDto> pageList = new ArrayList<>();
+        int index =  1 ;
         for (String uuid : uidTop) {
-            ShowProfileDto showProfileDto = uuidConverter.apply(uuid);
-             Player leaderboardPlayer    = playerRepo.findByUid(showProfileDto.getUuid());
-            leaderboardPlayer.setRank(playerService.getPlayerRank(uuid));
+            GetProfileDto getProfileDto = uuidConverter.apply(uuid);
+             Player leaderboardPlayer    = playerRepo.findByUid(getProfileDto.getUuid());
+            leaderboardPlayer.setRank(index);
             PlayerLeaderboardDto leaderboardPlayerdto = playerConverter.leaderboard(leaderboardPlayer);
             pageList.add(leaderboardPlayerdto);
+            index++;
         }
         return pageList;
 
@@ -67,20 +80,50 @@ public class RedisService {
      */
     public List<PlayerLeaderboardDto> getLeaderboardWithPageNumber(int pageNum) {
         Set<String> uidPerPage;
-        try (Jedis jedis = new Jedis("localhost") ){
-          //  uidPerPage =   jedis.zrevrangeByScore("leaderboard", 10000000, 0);
+        try (Jedis jedis = new Jedis(redisHost,redisPort)){
             uidPerPage = jedis.zrevrange("leaderboard",(pageNum-1)*10, pageNum*10 -1);
 
         }
         List<PlayerLeaderboardDto> pageList = new ArrayList<>();
+        int index = (pageNum-1)*10 +1 ;
         for (String uuid : uidPerPage) {
-            ShowProfileDto showProfileDto = uuidConverter.apply(uuid);
+            GetProfileDto showProfileDto = uuidConverter.apply(uuid);
             Player leaderboardPlayer    = playerRepo.findByUid(showProfileDto.getUuid());
-            leaderboardPlayer.setRank(playerService.getPlayerRank(uuid));
+            leaderboardPlayer.setRank(index);
             PlayerLeaderboardDto leaderboardPlayerdto = playerConverter.leaderboard(leaderboardPlayer);
             pageList.add(leaderboardPlayerdto);
+            index++;
         }
         return pageList;
 
     }
+
+    public List<PlayerLeaderboardDto> getLeaderboardWithCountry( String country, int pageNum) {
+        Set<String> uidPerPage;
+        try (Jedis jedis = new Jedis(redisHost,redisPort)){
+            uidPerPage = jedis.zrevrange("leaderboard-"+country,(pageNum-1)*10, pageNum*10 -1);
+
+        }
+        List<PlayerLeaderboardDto> pageList = new ArrayList<>();
+        int index = (pageNum-1)*10 +1 ;
+        for (String uuid : uidPerPage) {
+            GetProfileDto getProfileDto = uuidConverter.apply(uuid);
+            Player leaderboardPlayer    = playerRepo.findByUid(getProfileDto.getUuid());
+            leaderboardPlayer.setRank(index);
+            PlayerLeaderboardDto leaderboardPlayerdto = playerConverter.leaderboard(leaderboardPlayer);
+            pageList.add(leaderboardPlayerdto);
+            index++;
+        }
+        return pageList;
+
+    }
+
+    public int getPlayerRank(String uuid){
+        Long currentRank;
+        try (Jedis jedis = new Jedis(redisHost,redisPort)){
+            currentRank = Long.sum(jedis.zrevrank("leaderboard",uuid),1);
+        }
+        return currentRank.intValue();
+    }
+
 }

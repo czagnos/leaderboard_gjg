@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ShowProfileResponse {
+public class GetProfileResponse {
 
     @JsonProperty(value = "player")
     private PlayerDto playerDto;

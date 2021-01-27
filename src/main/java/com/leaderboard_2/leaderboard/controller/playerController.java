@@ -1,7 +1,8 @@
 package com.leaderboard_2.leaderboard.controller;
 
 import com.leaderboard_2.leaderboard.manager.PlayerManager;
-import com.leaderboard_2.leaderboard.models.response.ShowProfileResponse;
+import com.leaderboard_2.leaderboard.models.response.GetProfileResponse;
+import com.leaderboard_2.leaderboard.service.PlayerService;
 import org.springframework.web.bind.annotation.*;
 import com.leaderboard_2.leaderboard.models.response.CreatePlayerResponse;
 import com.leaderboard_2.leaderboard.models.request.CreatePlayerRequest;
@@ -12,6 +13,7 @@ import lombok.AllArgsConstructor;
 public class playerController {
 
     private final PlayerManager playerManager;
+    private final PlayerService playerService;
 
 
     /*
@@ -32,8 +34,13 @@ public class playerController {
      *@return createplayerresponse body
      */
     @GetMapping("/v1/user/{uuid}")
-    public ShowProfileResponse showProfile(@PathVariable String uuid){
-        return playerManager.showProfile(uuid);
+    public GetProfileResponse getProfile(@PathVariable String uuid){
+        return playerManager.getProfile(uuid);
+    }
+
+    @GetMapping("/v1/{n}")
+    public void createRandomUser(@PathVariable int n){
+         playerService.randomUser(n);
     }
 
 }

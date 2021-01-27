@@ -5,10 +5,10 @@ import com.leaderboard_2.leaderboard.models.converter.CreatePlayerRequestConvert
 import com.leaderboard_2.leaderboard.models.converter.UuidConverter;
 import com.leaderboard_2.leaderboard.models.dto.CreatePlayerDto;
 import com.leaderboard_2.leaderboard.models.dto.PlayerDto;
-import com.leaderboard_2.leaderboard.models.dto.ShowProfileDto;
+import com.leaderboard_2.leaderboard.models.dto.GetProfileDto;
 import com.leaderboard_2.leaderboard.models.request.CreatePlayerRequest;
 import com.leaderboard_2.leaderboard.models.response.CreatePlayerResponse;
-import com.leaderboard_2.leaderboard.models.response.ShowProfileResponse;
+import com.leaderboard_2.leaderboard.models.response.GetProfileResponse;
 import com.leaderboard_2.leaderboard.service.PlayerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,8 +28,6 @@ public class PlayerManager {
      *@return createplayerresponse body
      */
     public CreatePlayerResponse createPlayer(CreatePlayerRequest createPlayerRequest){
-        if (createPlayerRequest.getCountry() == null) throw new IllegalArgumentException("Invalid country.");
-        if (createPlayerRequest.getName() == null) throw new IllegalArgumentException("Invalid name.");
         CreatePlayerDto createPlayerDto = createPlayerRequestConverter.apply(createPlayerRequest);
         PlayerDto player = playerService.createPlayer(createPlayerDto);
 
@@ -43,12 +41,12 @@ public class PlayerManager {
      *@param  uuid as string
      *@return showplayerresponse body
      */
-    public ShowProfileResponse showProfile(String uuid){
+    public GetProfileResponse getProfile(String uuid){
         if (uuid == null) throw new IllegalArgumentException("Invalid uuid.");
-        ShowProfileDto showProfileDto = uuidConverter.apply(uuid);
-        PlayerDto player = playerService.showProfile(showProfileDto);
+        GetProfileDto getProfileDto = uuidConverter.apply(uuid);
+        PlayerDto player = playerService.getProfile(getProfileDto);
 
-        return ShowProfileResponse.builder()
+        return GetProfileResponse.builder()
                 .playerDto(player)
                 .build();
     }

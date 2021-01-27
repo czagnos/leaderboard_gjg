@@ -29,7 +29,7 @@ public class LeaderboardManager {
         *
         *@return list of player as data transfer object of player
          */
-        public List<PlayerLeaderboardDto> showLeaderboard(){
+        public List<PlayerLeaderboardDto> getLeaderboard(){
 
               return redisService.getLeaderboardTop();
                 
@@ -40,9 +40,20 @@ public class LeaderboardManager {
          *@param Number of page which is specified as integer
          *@return list of player as data transfer object of player
          */
-        public List<PlayerLeaderboardDto> showLeaderboardWithPageNumber(int pageNumber){
+        public List<PlayerLeaderboardDto> getLeaderboardWithPageNumber(int pageNumber){
             if(pageNumber<1)throw new IllegalArgumentException("Invalid page number.");
             return redisService.getLeaderboardWithPageNumber( pageNumber);
+
+    }
+    /*
+     * Getting list of players which is on specified page.
+     *
+     *@param Number of page which is specified as integer
+     *@return list of player as data transfer object of player
+     */
+    public List<PlayerLeaderboardDto> getLeaderboardWithCountry(String country, int pageNumber ){
+        if(pageNumber<1)throw new IllegalArgumentException("Invalid page number.");
+        return redisService.getLeaderboardWithCountry( country, pageNumber);
 
     }
 }

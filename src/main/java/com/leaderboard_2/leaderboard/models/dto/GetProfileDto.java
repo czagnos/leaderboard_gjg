@@ -6,6 +6,6 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ShowProfileDto {
+public class GetProfileDto {
     private String uuid;
 }
