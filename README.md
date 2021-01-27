@@ -17,7 +17,7 @@ For redis:
 
   In RedisService.java host name should be change:
   
-    Exp : 
+  Exp : 
     
               try (Jedis jedis = new Jedis("localhost")){
 
