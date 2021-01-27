@@ -53,3 +53,5 @@ For redis:
 7 - Create Random user - GET /user/{n}
 
           {n} --> Number of player, you want to create.
+          Giving score as between 1 and 1000.
+          4 specified country code randomy generated('tr','us','fr','br')
