@@ -1,6 +1,7 @@
 package com.leaderboard_2.leaderboard.service;
 
 
+import com.github.javafaker.Faker;
 import com.leaderboard_2.leaderboard.entity.Player;
 import com.leaderboard_2.leaderboard.entity.Score;
 import com.leaderboard_2.leaderboard.models.converter.PlayerConverter;
@@ -15,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Slf4j
@@ -72,7 +75,38 @@ public class PlayerService {
         }
 
 
+        public void randomUser(int n){
 
+            Faker faker = new Faker();
+
+            for(int i =0 ; i < n;i++){
+                String uid = UUID.randomUUID().toString();
+                Player player = new Player();
+                String[] countries = {"tr","br","us","fr"};
+                Score score = new Score();
+                String country = countries[faker.random().nextInt(0,3)];
+                double scoreDouble = faker.random().nextInt(1 , 1000);
+
+                player.setUid(uid );
+                player.setName(faker.name().firstName());
+                player.setCountry(country);
+                player.setRank(playerRepo.countAllBy()+1);
+
+                score.setUserId(uid);
+                score.setCountry(country);
+                score.setScore(scoreDouble);
+
+                SubmitScoreDto submitScoreDto = scoreConverter.apply(score);
+                redisService.cacheScore(submitScoreDto);
+               score = scoreService.persistScore(submitScoreDto);
+                score.setUpdatedAt( ZonedDateTime.now(ZoneId.of("UTC")));
+                player.setScore(score);
+                Player createdPlayer = playerRepo.save(player);
+                createdPlayer.setRank(redisService.getPlayerRank(uid));
+                playerRepo.save(createdPlayer);
+            }
+
+        }
 
 
 }

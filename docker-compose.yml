@@ -13,11 +13,6 @@ services:
       - "5432:5432"
 
 
-  master:
-    image: library/redis:6.0.8-alpine
-    container_name: leaderboard_cache
-    ports:
-      - "6379:6379"
 volumes:
   dbdata:
     driver: local

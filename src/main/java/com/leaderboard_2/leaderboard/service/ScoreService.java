@@ -10,6 +10,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -41,23 +47,13 @@ public class ScoreService {
         score.setUserId(submitScoreDto.getUuid());
         score.setScore(submitScoreDto.getScore());
         score.setCountry(submitScoreDto.getCountry());
+        score.setUpdatedAt( ZonedDateTime.now(ZoneId.of("UTC")));
         scoreRepo.save(score);
+        score.setUpdatedAt(null);
         return score;
     }
 
-    /*
-     * Adding score to database.
-     *
-     *@param submitscoredto
-     * @return score object
-     */
-    public Score persistSubmittedScore(SubmitScoreDto submitScoreDto){
-        Score score = new Score();
-        score =  scoreRepo.findByUserId(submitScoreDto.getUuid()).get();
-        score.setScore(submitScoreDto.getScore());
-        score.setCountry(submitScoreDto.getCountry());
-        return score;
-    }
+
 
 
 }

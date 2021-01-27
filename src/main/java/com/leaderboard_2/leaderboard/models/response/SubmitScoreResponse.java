@@ -6,6 +6,8 @@ import com.leaderboard_2.leaderboard.models.dto.SubmitScoreDto;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.ZonedDateTime;
+
 @Data
 @Builder
 public class SubmitScoreResponse {
@@ -18,7 +20,7 @@ public class SubmitScoreResponse {
     private Double score;
 
     @JsonProperty(value = "timestamp")
-    private Long timestamp;
+    private ZonedDateTime timestamp;
 
 
 }

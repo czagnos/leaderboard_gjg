@@ -77,7 +77,7 @@ public class PlayerServiceTest extends BaseTest {
         inOrder.verify(scoreConverter).apply(score);
         inOrder.verify(scoreService).persistScore(submitScoreDto);
         inOrder.verify(playerRepo).save(player);
-        inOrder.verify(pLayerConverter).apply(player);
+        inOrder.verify(pLayerConverter).apply(createdPlayer);
         inOrder.verifyNoMoreInteractions();
 
         assertThat(response.equals(playerDto));

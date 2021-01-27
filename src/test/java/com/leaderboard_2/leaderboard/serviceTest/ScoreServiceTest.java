@@ -1,6 +1,7 @@
 package com.leaderboard_2.leaderboard.serviceTest;
 
 import com.leaderboard_2.leaderboard.base.BaseTest;
+import com.leaderboard_2.leaderboard.entity.Player;
 import com.leaderboard_2.leaderboard.entity.Score;
 import com.leaderboard_2.leaderboard.models.converter.ScoreConverter;
 import com.leaderboard_2.leaderboard.models.dto.SubmitScoreDto;
@@ -15,6 +16,7 @@ import org.reactivestreams.Publisher;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -43,20 +45,17 @@ public class ScoreServiceTest extends BaseTest {
     @Test
     void shouldSubmitScoreToRepo(){
         //given
-        SubmitScoreDto submitScoreDto = mock(SubmitScoreDto.class);
+        SubmitScoreDto submitScoreDto =  mock(SubmitScoreDto.class);
         SubmitScoreDto returnSubmitScoreDto = mock(SubmitScoreDto.class);
-        Score score = new Score();
-         scoreServiceMock = new ScoreService(scoreRepo ,redisService,scoreConverter);
+        Score score =  new Score();
 
-        Mockito.when(scoreServiceMock.persistScore(submitScoreDto)).thenReturn(score);
+
         Mockito.when(scoreConverter.get(score)).thenReturn(returnSubmitScoreDto);
         //when
         SubmitScoreDto response = scoreService.submitScore(submitScoreDto);
 
         //then
-        InOrder inOrder = Mockito.inOrder(scoreConverter);
-        inOrder.verify(scoreConverter).get(score);
-        inOrder.verifyNoMoreInteractions();
+        verify(scoreConverter).get(score);
 
         assertThat(response.equals(returnSubmitScoreDto));
 
@@ -67,17 +66,20 @@ public class ScoreServiceTest extends BaseTest {
         //given
         SubmitScoreDto submitScoreDto = mock(SubmitScoreDto.class);
         Score score = new Score();
-        Score submittedScore = new Score();
+        Score result = new Score();
 
-        Mockito.when(scoreRepo.save(score)).thenReturn(submittedScore);
+        Mockito.when(scoreRepo.findByUserId(submitScoreDto.getUuid())).thenReturn(Optional.of(score));
+        Mockito.when(scoreRepo.save(score)).thenReturn(result);
+
         //when
         Score response = scoreService.persistScore(submitScoreDto);
 
         //then
-        verify(scoreRepo).save(score);
-
-        assertThat(response.equals(score));
-
+        InOrder inOrder = Mockito.inOrder((scoreRepo));
+        inOrder.verify(scoreRepo).findByUserId(submitScoreDto.getUuid());
+        inOrder.verify(scoreRepo).save(score);
+        inOrder.verifyNoMoreInteractions();
+        assertThat(result.equals(response));
 
 
     }
