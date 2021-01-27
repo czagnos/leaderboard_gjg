@@ -19,7 +19,8 @@ For redis:
   
   Exp : 
     
-              try (Jedis jedis = new Jedis("localhost")){
+                 private   String redisHost = "localhost";
+                 private   int redisPort = 6379;
 
 
 # endpoints
@@ -40,6 +41,7 @@ For redis:
         
           Sample JSON Request:
           { "uuid" : "1e673707-8380-42bd-a798-ccb29bff834c", "score" : 999.0, "country": "tr" }
+          *Cannot send score before create a user.
       
 5 - Create New User      - POST /user/create    
         
@@ -49,6 +51,7 @@ For redis:
 6 - Get User Profile - GET /user/profile/{uuid}
 
           {uuid} --> Player user id
+          *Cannot get profile before create a user.
 
 7 - Create Random user - GET /user/{n}
 
