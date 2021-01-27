@@ -41,4 +41,6 @@ For redis:
 
 6 - Get User Profile - GET /user/profile/{uuid}
       {uuid} --> Player user id
-      
+
+7 - Create Random user - GET /user/{n}
+      {n} --> Number of player, you want to create.
